@@ -1,0 +1,37 @@
+package cgg.a06;
+import cgtools.*;
+
+public class ClosedCylinder implements Shape {
+    private Cylinder cylinder;
+    private Disc bottom;
+    private Disc top;
+
+    public ClosedCylinder(Point pos, double rad, double height, Material material) {
+        this.cylinder = new Cylinder(pos, rad, height, material);
+        this.bottom = new Disc(pos, rad, new Direction(0,-0.5,0) ,material);
+        this.top = new Disc(new Point(pos.x(), pos.y() + height, pos.z()), rad,new Direction(0,-0.5,0), material);
+    }
+
+    @Override
+    public Hit intersect(Ray ray) {
+        Hit hitCylinder = cylinder.intersect(ray);
+        Hit hitBottom = bottom.intersect(ray);
+        Hit hitTop = top.intersect(ray);
+
+        Hit closestHit = null;
+
+        if (hitCylinder != null && (closestHit == null )) {
+            closestHit = hitCylinder;
+        }
+
+        if (hitBottom != null && (closestHit == null || hitBottom.t() < closestHit.t())) {
+            closestHit = hitBottom;
+        }
+
+        if (hitTop != null && (closestHit == null || hitTop.t() < closestHit.t())) {
+            closestHit = hitTop;
+        }
+
+        return closestHit;
+    }
+}
